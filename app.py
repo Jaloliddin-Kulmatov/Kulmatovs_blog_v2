@@ -22,7 +22,11 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_URI") or "sqlite:///p
 
 # SSL only for Postgres
 if "postgres" in app.config['SQLALCHEMY_DATABASE_URI']:
-    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {"connect_args": {"sslmode": "require"}}
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+        "connect_args": {"sslmode": "require"},
+        "pool_pre_ping": True,      # ✅ detects dead connections
+        "pool_recycle": 300         # ✅ recycles connections every 5 mins
+    }
 
 # -------------------- DB SETUP --------------------
 class Base(DeclarativeBase):
@@ -41,7 +45,7 @@ login_manager.login_view = "login"
 
 @login_manager.user_loader
 def load_user(user_id):
-    return db.session.get(User, int(user_id))  # ✅ Fixed: no longer deprecated
+    return db.session.get(User, int(user_id))
 
 def admin_only(f):
     @wraps(f)
@@ -211,7 +215,7 @@ def contact():
         phone = request.form["phone"]
         message = request.form["message"]
         try:
-            with smtplib.SMTP("smtp.gmail.com") as connection:
+            with smtplib.SMTP("smtp.gmail.com", timeout=10) as connection:  # ✅ added timeout
                 connection.starttls()
                 connection.login(
                     user=os.environ.get("FROM_ADD"),
