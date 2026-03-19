@@ -10,22 +10,23 @@ from sqlalchemy import Integer, String, Text
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms import RegisterForm, LoginForm, CommentForm, CreateForm as CreatePostForm
-import smtplib
+import sendgrid
+from sendgrid.helpers.mail import Mail
 import os
 
 # -------------------- APP CONFIG --------------------
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY", "dev-key")
 
-# Database URL (Render uses Postgres)
+# Database URL (Render uses Postgres internal URL)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_URI") or "sqlite:///posts.db"
 
 # SSL only for Postgres
 if "postgres" in app.config['SQLALCHEMY_DATABASE_URI']:
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
         "connect_args": {"sslmode": "require"},
-        "pool_pre_ping": True,      # ✅ detects dead connections
-        "pool_recycle": 300         # ✅ recycles connections every 5 mins
+        "pool_pre_ping": True,
+        "pool_recycle": 300
     }
 
 # -------------------- DB SETUP --------------------
@@ -215,18 +216,16 @@ def contact():
         phone = request.form["phone"]
         message = request.form["message"]
         try:
-            with smtplib.SMTP("smtp.gmail.com", timeout=10) as connection:  # ✅ added timeout
-                connection.starttls()
-                connection.login(
-                    user=os.environ.get("FROM_ADD"),
-                    password=os.environ.get("APP_PASSWORD")
-                )
-                connection.sendmail(
-                    from_addr=os.environ.get("FROM_ADD"),
-                    to_addrs=os.environ.get("TO_ADD"),
-                    msg=f"Subject: Blog Contact\n\n{name}\n{email}\n{phone}\n{message}"
-                )
-        except Exception:
+            sg = sendgrid.SendGridAPIClient(api_key=os.environ.get("SENDGRID_API_KEY"))
+            email_message = Mail(
+                from_email=os.environ.get("FROM_ADD"),
+                to_emails=os.environ.get("TO_ADD"),
+                subject="Blog Contact Form",
+                plain_text_content=f"Name: {name}\nEmail: {email}\nPhone: {phone}\nMessage: {message}"
+            )
+            sg.send(email_message)
+        except Exception as e:
+            print(f"SendGrid error: {e}")  # ✅ prints real error to Render logs
             flash("Failed to send email. Try again later.")
             return render_template("contact.html", sent=False)
 
