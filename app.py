@@ -24,7 +24,13 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_URI") or "sqlite:///p
 if "postgres" in app.config['SQLALCHEMY_DATABASE_URI']:
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {"connect_args": {"sslmode": "require"}}
 
-db = SQLAlchemy(app)
+# -------------------- DB SETUP --------------------
+class Base(DeclarativeBase):
+    pass
+
+db = SQLAlchemy(model_class=Base)
+db.init_app(app)
+
 ckeditor = CKEditor(app)
 Bootstrap5(app)
 
@@ -35,12 +41,11 @@ login_manager.login_view = "login"
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return db.session.get(User, int(user_id))  # ✅ Fixed: no longer deprecated
 
 def admin_only(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        # Admin check (MVP: user id 1)
         if not current_user.is_authenticated or current_user.id != 1:
             return abort(403)
         return f(*args, **kwargs)
@@ -50,9 +55,6 @@ def admin_only(f):
 gravatar = Gravatar(app, size=100, rating='g', default='retro')
 
 # -------------------- MODELS --------------------
-class Base(DeclarativeBase):
-    pass
-
 class User(UserMixin, db.Model):
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -101,7 +103,7 @@ def get_all_posts():
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
-        if User.query.filter_by(email=form.email.data).first():
+        if db.session.execute(db.select(User).where(User.email == form.email.data)).scalar():
             flash("Account exists. Login instead.")
             return redirect(url_for('login'))
 
@@ -118,11 +120,13 @@ def register():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        user = db.session.execute(db.select(User).where(User.email == form.email.data)).scalar()
         if not user:
-            flash("No account found.")
+            flash("No account found with that email.")
+            return redirect(url_for('login'))
         elif not check_password_hash(user.password, form.password.data):
-            flash("Wrong password.")
+            flash("Wrong password. Please try again.")
+            return redirect(url_for('login'))
         else:
             login_user(user)
             next_page = request.args.get('next')
