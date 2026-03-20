@@ -1,3 +1,5 @@
+![Home page](https://github.com/user-attachments/assets/33d2bc3e-b122-4bc1-a1a4-7182fcbfa600)
+
 # Flask Blog
 
 A full-featured blogging platform built with Flask, supporting user authentication, rich-text post creation, comments, Gravatar avatars, and contact form email delivery via SendGrid. Deployable to Render with PostgreSQL.
@@ -18,8 +20,6 @@ A full-featured blogging platform built with Flask, supporting user authenticati
 ---
 
 ## Screenshots
-
-![Home page](https://github.com/user-attachments/assets/33d2bc3e-b122-4bc1-a1a4-7182fcbfa600)
 
 ![Blog post](https://github.com/user-attachments/assets/17eebd9b-7a2c-49f6-8be8-c4b26fea81a6)
 
