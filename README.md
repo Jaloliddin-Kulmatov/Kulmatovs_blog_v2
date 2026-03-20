@@ -1,6 +1,6 @@
 ![Home page](https://github.com/user-attachments/assets/33d2bc3e-b122-4bc1-a1a4-7182fcbfa600)
 
-# Flask Blog
+# Flask Blog ---- https://kulmatovs-blog.onrender.com
 
 A full-featured blogging platform built with Flask, supporting user authentication, rich-text post creation, comments, Gravatar avatars, and contact form email delivery via SendGrid. Deployable to Render with PostgreSQL.
 
