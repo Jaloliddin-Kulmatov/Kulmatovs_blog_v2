@@ -1,10 +1,3 @@
-
-<img width="1426" height="780" alt="Screenshot 2026-03-20 at 1 15 37 PM" src="https://github.com/user-attachments/assets/33d2bc3e-b122-4bc1-a1a4-7182fcbfa600" />
-
-<img width="1425" height="778" alt="Screenshot 2026-03-20 at 1 18 01 PM" src="https://github.com/user-attachments/assets/17eebd9b-7a2c-49f6-8be8-c4b26fea81a6" />
-
-<img width="1424" height="772" alt="Screenshot 2026-03-20 at 1 19 10 PM" src="https://github.com/user-attachments/assets/7a435cc0-dbb0-41c4-af69-e046b0943c55" />
-
 # Flask Blog
 
 A full-featured blogging platform built with Flask, supporting user authentication, rich-text post creation, comments, Gravatar avatars, and contact form email delivery via SendGrid. Deployable to Render with PostgreSQL.
@@ -21,6 +14,16 @@ A full-featured blogging platform built with Flask, supporting user authenticati
 - **Contact form** — sends email via SendGrid API
 - **Database** — SQLite for local development, PostgreSQL for production
 - **Deployment-ready** — configured for Render with Gunicorn and SSL
+
+---
+
+## Screenshots
+
+![Home page](https://github.com/user-attachments/assets/33d2bc3e-b122-4bc1-a1a4-7182fcbfa600)
+
+![Blog post](https://github.com/user-attachments/assets/17eebd9b-7a2c-49f6-8be8-c4b26fea81a6)
+
+![Contact / About](https://github.com/user-attachments/assets/7a435cc0-dbb0-41c4-af69-e046b0943c55)
 
 ---
 
